@@ -1,95 +1,57 @@
-const locations = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"];
-const activities = ["Concerts", "Hiking", "Local Markets", "Walking Tracks", "Vineyards", "Museums", "Festivals", "Theater", "Workshops", "Outdoor Events"];
 
-function autocomplete(input, array) {
-    let currentFocus;
-    
-    input.addEventListener("input", function(e) {
-        const value = this.value;
-        closeAllLists();
-        if (!value) return false;
-        
-        currentFocus = -1;
+const geoApiKey = fe33969dcdad4a51871bca019bfdc17b;
+const ticketMasterKey = bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5;
 
-        const listDiv = document.createElement("div");
-        listDiv.setAttribute("id", this.id + "autocomplete-list");
-        listDiv.setAttribute("class", "autocomplete-items");
-        this.parentNode.appendChild(listDiv);
+async function fetchActivities(location, startDate, endDate) {
+    try {
+        // Get latitude and longitude using Geoapify
+        const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${location}&apiKey=${geoApiKey}`);
+        const geoData = await geoResponse.json();
 
-        for (let item of array) {
-            if (item.substr(0, value.length).toUpperCase() === value.toUpperCase()) {
-                const itemDiv = document.createElement("div");
-                itemDiv.innerHTML = "<strong>" + item.substr(0, value.length) + "</strong>";
-                itemDiv.innerHTML += item.substr(value.length);
-                itemDiv.innerHTML += "<input type='hidden' value='" + item + "'>";
-                
-                itemDiv.addEventListener("click", function(e) {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                });
-                listDiv.appendChild(itemDiv);
-            }
+        if (!geoData.results || geoData.results.length === 0) {
+            alert('Location not found');
+            return;
         }
-    });
 
-    input.addEventListener("keydown", function(e) {
-        const listDiv = document.getElementById(this.id + "autocomplete-list");
-        if (listDiv) {
-            const items = listDiv.getElementsByTagName("div");
-            if (e.keyCode === 40) {
-                currentFocus++;
-                addActive(items);
-            } else if (e.keyCode === 38) {
-                currentFocus--;
-                addActive(items);
-            } else if (e.keyCode === 13) {
-                e.preventDefault();
-                if (currentFocus > -1) {
-                    if (items) items[currentFocus].click();
-                }
-            }
+        const { lat, lon } = geoData.results[0].geometry; // Extract coordinates
+
+        // Fetch events from Ticketmaster
+        const eventsResponse = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?latlong=${lat},${lon}&startDateTime=${startDate}T00:00:00Z&endDateTime=${endDate}T23:59:59Z&apikey=${ticketMasterKey}`);
+        const eventsData = await eventsResponse.json();
+
+        if (!eventsData._embedded || eventsData._embedded.events.length === 0) {
+            alert('No events found for this location and date range');
+            return;
         }
-    });
 
-    function addActive(items) {
-        if (!items) return false;
-        removeActive(items);
-        if (currentFocus >= items.length) currentFocus = 0;
-        if (currentFocus < 0) currentFocus = items.length - 1;
-        items[currentFocus].classList.add("autocomplete-active");
+        displayResults(eventsData._embedded.events);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
     }
+}
 
-    function removeActive(items) {
-        for (let item of items) {
-            item.classList.remove("autocomplete-active");
-        }
-    }
+// Function to display results
+function displayResults(events) {
+    const resultsList = document.getElementById('results-list');
+    resultsList.innerHTML = ""; // Clear previous results
 
-    function closeAllLists(elmnt) {
-        const items = document.getElementsByClassName("autocomplete-items");
-        for (let item of items) {
-            if (elmnt !== item && elmnt !== input) {
-                item.parentNode.removeChild(item);
-            }
-        }
-    }
-
-    document.addEventListener("click", function(e) {
-        closeAllLists(e.target);
+    events.forEach(event => {
+        const li = document.createElement('li');
+        li.textContent = `${event.name} - ${event.dates.start.localDate}`;
+        resultsList.appendChild(li);
     });
 }
 
-autocomplete(document.getElementById("location"), locations);
-autocomplete(document.getElementById("activity"), activities);
-
-// Fetch activities based on search
-document.getElementById("search-btn").addEventListener("click", function() {
-    const location = document.getElementById("location").value;
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-    const activity = document.getElementById("activity").value;
+// Event listeners
+document.getElementById('search-btn').addEventListener('click', () => {
+    const location = document.getElementById('location').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
     
-    // This is where you would execute a real API call, for now, we will just show the values
-    const resultsList = document.getElementById("results-list");
-    resultsList.innerHTML = `<li>Location: ${location}, Start Date: ${startDate}, End Date: ${endDate}, Activity: ${activity}</li>`;
+    if (!location || !startDate || !endDate) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    fetchActivities(location, startDate, endDate);
 });
