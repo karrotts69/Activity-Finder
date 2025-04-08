@@ -63,3 +63,25 @@ document.getElementById('search-btn').addEventListener('click', () => {
 
     fetchActivities(location, startDate, endDate, budget);
 });
+// Add this part below your existing code in script.js.
+
+document.getElementById("start-date").addEventListener("change", function() {
+    const startDateValue = this.value;
+    const endDateInput = document.getElementById("end-date");
+
+    // Set the minimum date of the end date to the selected start date
+    if (startDateValue) {
+        endDateInput.setAttribute("min", startDateValue);
+    }
+});
+
+document.getElementById("end-date").addEventListener("change", function() {
+    const startDateValue = document.getElementById("start-date").value;
+    const endDateValue = this.value;
+
+    // Check if end date is before start date
+    if (endDateValue < startDateValue) {
+        alert("The 'Till' date cannot be before the 'From' date.");
+        this.value = ''; // Clear the end date input
+    }
+});
