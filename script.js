@@ -1,32 +1,42 @@
 const geoApiKey = "fe33969dcdad4a51871bca019bfdc17b";
 const ticketMasterKey = "bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5";
 
-async function fetchActivities(location, startDate, endDate) {
-    try {
-        // Get latitude and longitude using Geoapify
-        const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${location}&apiKey=${geoApiKey}`);
-        const geoData = await geoResponse.json();
+async function fetchPlaceSuggestions(query) {
+    const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${query}&apiKey=${geoApiKey}`);
+    const geoData = await geoResponse.json();
+    return geoData.features; // Return the found features
+}
 
-        if (!geoData.results || geoData.results.length === 0) {
-            alert('Location not found');
-            return;
-        }
+function createSuggestionList(suggestions) {
+    const resultsList = document.getElementById('suggestions-list');
+    resultsList.innerHTML = ""; // Clear previous suggestions
 
-        const { lat, lon } = geoData.results[0].geometry; // Extract coordinates
+    suggestions.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.textContent = suggestion.properties.formatted; // Show the formatted location
+        li.className = 'suggestion-item';
+        li.addEventListener('click', () => {
+            document.getElementById('location').value = suggestion.properties.formatted; // Set the input value
+            resultsList.innerHTML = ''; // Clear suggestions after selecting
+        });
+        resultsList.appendChild(li);
+    });
+}
 
-        // Fetch events from Ticketmaster
-        const eventsResponse = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?latlong=${lat},${lon}&startDateTime=${startDate}T00:00:00Z&endDateTime=${endDate}T23:59:59Z&apikey=${ticketMasterKey}`);
-        const eventsData = await eventsResponse.json();
-
-        if (!eventsData._embedded || eventsData._embedded.events.length === 0) {
-            alert('No events found for this location and date range');
-            return;
-        }
-
-        displayResults(eventsData._embedded.events);
-    } catch (error) {
-        console.error('Error fetching activities:', error);
+async function handleLocationInput(event) {
+    const query = event.target.value;
+    if (query.length > 2) { // Fetch suggestions only if the query is more than 2 characters
+        const suggestions = await fetchPlaceSuggestions(query);
+        createSuggestionList(suggestions);
     }
+}
+
+// Add event listener to the input
+document.getElementById('location').addEventListener('input', handleLocationInput);
+
+// Search function remains the same
+async function fetchActivities(location, startDate, endDate) {
+    // Your existing fetchActivities code here...
 }
 
 // Function to display results
