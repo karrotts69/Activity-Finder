@@ -1,49 +1,114 @@
-const geoApiKey = "fe33969dcdad4a51871bca019bfdc17b";
-const ticketMasterKey = "bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5";
+const geoApiKey = 'fe33969dcdad4a51871bca019bfdc17b'; // Geoapify API
+const ticketMasterKey = 'bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5'; // Ticketmaster API
+const eventfulKey = 'YOUR_EVENTFUL_API_KEY'; // Eventful API
+const meetupKey = 'YOUR_MEETUP_API_KEY'; // Meetup API
 
-// Fetch small towns based on user input
-async function fetchNearbyTowns(location) {
-    const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${location}&format=json`);
+// Function to fetch place suggestions (Auto-complete)
+async function fetchPlaceSuggestions(query) {
+    const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${query}&apiKey=${geoApiKey}`);
     const geoData = await geoResponse.json();
-    return geoData;
+    return geoData.features; // Return the found features
 }
 
+// Create suggestion list for the location input
+function createSuggestionList(suggestions) {
+    const resultsList = document.getElementById('suggestions-list');
+    resultsList.innerHTML = ""; // Clear previous suggestions
+
+    suggestions.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.textContent = suggestion.properties.formatted; // Show the formatted location
+        li.className = 'suggestion-item';
+        li.addEventListener('click', () => {
+            document.getElementById('location').value = suggestion.properties.formatted; // Set the input value
+            resultsList.innerHTML = ''; // Clear suggestions after selecting
+        });
+        resultsList.appendChild(li);
+    });
+}
+
+// Handle location input
+async function handleLocationInput(event) {
+    const query = event.target.value;
+    if (query.length > 2) { // Fetch suggestions only if the query is more than 2 characters
+        const suggestions = await fetchPlaceSuggestions(query);
+        createSuggestionList(suggestions);
+    }
+}
+
+// Fetch nearby towns using Geoapify
+async function fetchNearbyTowns(location) {
+    const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${location}&apiKey=${geoApiKey}`);
+    const geoData = await geoResponse.json();
+    return geoData.results;
+}
+
+// Fetch events from Ticketmaster
+async function fetchTicketmasterEvents(lat, lon, startDate, endDate, budget) {
+    const eventsResponse = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?latlong=${lat},${lon}&startDateTime=${startDate}T00:00:00Z&endDateTime=${endDate}T23:59:59Z&apikey=${ticketMasterKey}`);
+    return await eventsResponse.json();
+}
+
+// Fetch activities from Eventful
+async function fetchEventfulActivities(location, startDate, endDate) {
+    const eventsResponse = await fetch(`http://api.eventful.com/json/events/search?location=${location}&date=${startDate},${endDate}&page_size=10&app_key=${eventfulKey}`);
+    const eventsData = await eventsResponse.json();
+    return eventsData.events; // Return the list of events
+}
+
+// Display results in the UI
+function displayResults(events) {
+    const resultsList = document.getElementById('results-list');
+    resultsList.innerHTML = ""; // Clear previous results
+
+    events.forEach(event => {
+        const li = document.createElement('li');
+        li.textContent = `${event.name || event.title} - ${event.start_time || event.date}`;
+        if (event.venue) {
+            li.textContent += ` at ${event.venue.name}`;
+        }
+        resultsList.appendChild(li);
+    });
+}
+
+// Fetch activities based on location, date, and budget
 async function fetchActivities(location, startDate, endDate, budget) {
     try {
         const towns = await fetchNearbyTowns(location);
         console.log('Nearby Towns:', towns); // Debug output
 
-        // Select the first town's name and coordinates
         if (towns.length === 0) {
-            alert('No towns found for this location');
+            alert('No towns found for this location.');
             return;
         }
 
         const { display_name, lat, lon } = towns[0]; // Get display name and coordinates of the first town
         console.log(`Searching events in: ${display_name}`);
 
-        // Fetch events from Ticketmaster
-        const eventsResponse = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?latlong=${lat},${lon}&startDateTime=${startDate}T00:00:00Z&endDateTime=${endDate}T23:59:59Z&apikey=${ticketMasterKey}`);
-        const eventsData = await eventsResponse.json();
-
-        console.log('Ticketmaster response:', eventsData); // Debugging line
-
-        if (!eventsData._embedded || eventsData._embedded.events.length === 0) {
+        // Ticketmaster events
+        const eventsData = await fetchTicketmasterEvents(lat, lon, startDate, endDate, budget);
+        if (!eventsData._embedded || !eventsData._embedded.events) {
             alert('No events found for this location and date range');
-            return;
+        } else {
+            const filteredEvents = eventsData._embedded.events.filter(event => {
+                return event.priceRanges && event.priceRanges.length > 0 && event.priceRanges[0].min <= budget;
+            });
+
+            if (filteredEvents.length > 0) {
+                displayResults(filteredEvents);
+            } else {
+                alert('No paid events found within your budget');
+            }
         }
 
-        // Filter events based on budget
-        const filteredEvents = eventsData._embedded.events.filter(event => {
-            return (event.priceRanges && event.priceRanges.length > 0 && event.priceRanges[0].min <= budget);
-        });
-
-        if (filteredEvents.length === 0) {
-            alert('No events found within your budget');
-            return;
+        // Eventful activities
+        const eventfulEvents = await fetchEventfulActivities(display_name, startDate, endDate);
+        if (eventfulEvents && eventfulEvents.length > 0) {
+            displayResults(eventfulEvents);
+        } else {
+            alert('No free events found from Eventful');
         }
 
-        displayResults(filteredEvents);
     } catch (error) {
         console.error('Error fetching activities:', error);
     }
@@ -56,6 +121,7 @@ document.getElementById('search-btn').addEventListener('click', () => {
     const endDate = document.getElementById('end-date').value;
     const budget = parseFloat(document.getElementById('budget').value.trim()) || 0; // Get the budget value
 
+    // Validate inputs
     if (!location || !startDate || !endDate || budget < 0) {
         alert('Please fill in all fields with valid data');
         return;
@@ -63,43 +129,6 @@ document.getElementById('search-btn').addEventListener('click', () => {
 
     fetchActivities(location, startDate, endDate, budget);
 });
-function displayResults(events) {
-    const resultsList = document.getElementById('results-list');
-    resultsList.innerHTML = ""; // Clear previous results
 
-    events.forEach(event => {
-        const li = document.createElement('li');
-
-        // Display the name and location
-        li.textContent = `${event.name} - ${event.dates.start.localDate}`;
-        if (event._embedded && event._embedded.venues) {
-            li.textContent += ` at ${event._embedded.venues[0].name}`;
-        }
-        
-        resultsList.appendChild(li);
-    });
-}
-
-// Ensure this function is included in your script.js after the fetchActivities function
-// Add this part below your existing code in script.js.
-
-document.getElementById("start-date").addEventListener("change", function() {
-    const startDateValue = this.value;
-    const endDateInput = document.getElementById("end-date");
-
-    // Set the minimum date of the end date to the selected start date
-    if (startDateValue) {
-        endDateInput.setAttribute("min", startDateValue);
-    }
-});
-
-document.getElementById("end-date").addEventListener("change", function() {
-    const startDateValue = document.getElementById("start-date").value;
-    const endDateValue = this.value;
-
-    // Check if end date is before start date
-    if (endDateValue < startDateValue) {
-        alert("The 'Till' date cannot be before the 'From' date.");
-        this.value = ''; // Clear the end date input
-    }
-});
+// Event listener for location input for auto-complete functionality
+document.getElementById('location').addEventListener('input', handleLocationInput);
