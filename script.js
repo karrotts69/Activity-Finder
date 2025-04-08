@@ -36,7 +36,38 @@ document.getElementById('location').addEventListener('input', handleLocationInpu
 
 // Search function remains the same
 async function fetchActivities(location, startDate, endDate) {
-    // Your existing fetchActivities code here...
+    try {
+        // Log the input values for debugging
+        console.log(`Fetching activities for location: ${location}, from: ${startDate} to: ${endDate}`);
+
+        // Get latitude and longitude using Geoapify
+        const geoResponse = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${location}&apiKey=${geoApiKey}`);
+        const geoData = await geoResponse.json();
+
+        console.log('Geoapify response:', geoData); // Debugging line
+
+        if (!geoData.results || geoData.results.length === 0) {
+            alert('Location not found');
+            return;
+        }
+
+        const { lat, lon } = geoData.results[0].geometry; // Extract coordinates
+
+        // Fetch events from Ticketmaster
+        const eventsResponse = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?latlong=${lat},${lon}&startDateTime=${startDate}T00:00:00Z&endDateTime=${endDate}T23:59:59Z&apikey=${ticketMasterKey}`);
+        const eventsData = await eventsResponse.json();
+
+        console.log('Ticketmaster response:', eventsData); // Debugging line
+
+        if (!eventsData._embedded || eventsData._embedded.events.length === 0) {
+            alert('No events found for this location and date range');
+            return;
+        }
+
+        displayResults(eventsData._embedded.events);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+    }
 }
 
 // Function to display results
