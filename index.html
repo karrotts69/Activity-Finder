@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activity Finder</title>
     
-    <!-- Add Bootstrap CSS (You can also use Tailwind CSS) -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
     <link rel="stylesheet" href="style.css">
@@ -17,26 +16,18 @@
     </header>
 
     <main class="container mt-4">
-        <div class="filter-container mb-3">
-            <h3>Filter by Activity Type:</h3>
-            <input type="checkbox" id="concerts" value="concerts"> Concerts
-            <input type="checkbox" id="markets" value="markets"> Local Markets
-            <input type="checkbox" id="hiking" value="hiking"> Hiking
-            <!-- Add more checkboxes for other activities -->
-        </div>
-
         <div class="search-container mb-4">
             <input type="text" id="location" class="form-control" placeholder="Enter a location..." autocomplete="off">
+            <ul id="suggestions-list" class="list-unstyled"></ul>
             <input type="date" id="start-date" class="form-control mt-2" placeholder="Start Date">
             <input type="date" id="end-date" class="form-control mt-2" placeholder="End Date">
+            <input type="number" id="budget" class="form-control mt-2" placeholder="Budget for Activities" min="0">
             <button id="search-btn" class="btn btn-primary mt-2">Search</button>
-            <!-- Add this below the input field -->
         </div>
 
         <div id="results-container">
             <h2>Results:</h2>
             <ul id="results-list" class="list-unstyled"></ul>
-            <ul id="suggestions-list" class="list-unstyled"></ul>
         </div>
     </main>
 
