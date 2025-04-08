@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Activity Finder</h1>
+        <p>Find activities in your area</p>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <input type="text" id="location" placeholder="Enter a location..." autocomplete="off">
+            <input type="date" id="start-date" placeholder="Start Date">
+            <input type="date" id="end-date" placeholder="End Date">
+            <input type="text" id="activity" placeholder="Enter activity (e.g., concert)">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div id="results-container">
+            <h2>Results:</h2>
+            <ul id="results-list"></ul>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
