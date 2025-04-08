@@ -1,8 +1,23 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
+}
+
+h1, h2 {
+    margin: 20px 0;
+}
+
+.filter-container {
+    background: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#results-list li {
+    background: white;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
 }
 
 header {
