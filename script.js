@@ -63,6 +63,24 @@ document.getElementById('search-btn').addEventListener('click', () => {
 
     fetchActivities(location, startDate, endDate, budget);
 });
+function displayResults(events) {
+    const resultsList = document.getElementById('results-list');
+    resultsList.innerHTML = ""; // Clear previous results
+
+    events.forEach(event => {
+        const li = document.createElement('li');
+
+        // Display the name and location
+        li.textContent = `${event.name} - ${event.dates.start.localDate}`;
+        if (event._embedded && event._embedded.venues) {
+            li.textContent += ` at ${event._embedded.venues[0].name}`;
+        }
+        
+        resultsList.appendChild(li);
+    });
+}
+
+// Ensure this function is included in your script.js after the fetchActivities function
 // Add this part below your existing code in script.js.
 
 document.getElementById("start-date").addEventListener("change", function() {
