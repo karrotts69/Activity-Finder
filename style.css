@@ -68,3 +68,19 @@ button:hover {
     list-style-type: none;
     padding: 0;
 }
+#suggestions-list {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: #f0f0f0; /* Highlight on hover */
+}
