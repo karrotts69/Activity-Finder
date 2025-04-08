@@ -57,6 +57,7 @@ document.getElementById('search-btn').addEventListener('click', () => {
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
     
+    // Validate inputs
     if (!location || !startDate || !endDate) {
         alert('Please fill in all fields');
         return;
