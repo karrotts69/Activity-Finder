@@ -1,56 +1,10 @@
+/* Body configuration */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
 }
 
-label {
-    font-weight: bold; /* Make labels bolder */
-}
-
-.search-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-#location {
-    width: 100%; /* Ensure it takes the full container width */
-}
-
-#suggestions-list {
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-.suggestion-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.suggestion-item:hover {
-    background: #f0f0f0; /* Highlight on hover */
-}
-h1, h2 {
-    margin: 20px 0;
-}
-
-.filter-container {
-    background: #e9ecef;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-#results-list li {
-    background: white;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-}
-
+/* Header styles */
 header {
     background-color: #4CAF50;
     color: white;
@@ -58,22 +12,35 @@ header {
     padding: 1em 0;
 }
 
+/* Main container styles */
 .search-container {
-    display: flex;
-    justify-content: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
-    max-width: 800px;
+    display: flex;
+    flex-direction: column; /* Align items in a column */
+    max-width: 800px;      /* Limit the width */
 }
 
+/* Label styles */
+label {
+    font-weight: bold; /* Make labels bolder */
+    margin-top: 10px; /* Add top margin for spacing */
+}
+
+/* Input styles */
 input[type="text"],
-input[type="date"] {
+input[type="date"],
+input[type="number"] {
     padding: 10px;
-    margin: 5px;
+    margin: 5px 0; /* Space above and below each input */
     border: 1px solid #ccc;
     border-radius: 4px;
-    flex: 1;
 }
 
+/* Button styles */
 button {
     padding: 10px 20px;
     background-color: #4CAF50;
@@ -81,12 +48,14 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-top: 10px; /* Space above button */
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Darker green on hover */
 }
 
+/* Results container styles */
 #results-container {
     margin: 20px auto;
     max-width: 800px;
@@ -95,10 +64,13 @@ button:hover {
     border-radius: 5px;
 }
 
-#results-list {
+/* List styles */
+#results-list,
+#suggestions-list {
     list-style-type: none;
     padding: 0;
 }
+
 #suggestions-list {
     background: white;
     border: 1px solid #ccc;
@@ -107,6 +79,7 @@ button:hover {
     overflow-y: auto;
 }
 
+/* Individual suggestion item styles */
 .suggestion-item {
     padding: 8px;
     cursor: pointer;
@@ -114,4 +87,17 @@ button:hover {
 
 .suggestion-item:hover {
     background: #f0f0f0; /* Highlight on hover */
+}
+
+/* Additional margin for headings */
+h1, h2 {
+    margin: 20px 0;
+}
+
+/* Results list item styles */
+#results-list li {
+    background: white;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
 }
