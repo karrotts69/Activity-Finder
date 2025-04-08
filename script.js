@@ -1,5 +1,5 @@
-const geoApiKey = fe33969dcdad4a51871bca019bfdc17b;
-const ticketMasterKey = bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5;
+const geoApiKey = "fe33969dcdad4a51871bca019bfdc17b";
+const ticketMasterKey = "bbvKoLxRUyQWAFuQeCwzpBAPvAMV1DR5";
 
 async function fetchActivities(location, startDate, endDate) {
     try {
