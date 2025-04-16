@@ -98,3 +98,63 @@ h1, h2 {
     margin-bottom: 5px;
     border-radius: 4px;
 }
+/* Autocomplete styles */
+.autocomplete-container {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: calc(100% - 2px);
+    display: none;
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.autocomplete-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* Map container */
+#map {
+    height: 400px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Results styling */
+.results-list {
+    list-style: none;
+    padding: 0;
+}
+
+.results-list li {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.view-on-map {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.loading {
+    text-align: center;
+    font-style: italic;
+}
+
+.error {
+    color: red;
+}
