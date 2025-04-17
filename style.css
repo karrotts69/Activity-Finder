@@ -30,11 +30,14 @@ label {
 /* Input styles */
 input[type="text"],
 input[type="date"],
-input[type="number"] {
+input[type="number"],
+select {
     padding: 10px;
     margin: 5px 0; /* Space above and below each input */
     border: 1px solid #ccc;
     border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Button styles */
@@ -53,58 +56,103 @@ button:hover {
 }
 
 /* Results container styles */
-#results-container {
+#resultsContainer {
     margin: 20px auto;
     max-width: 800px;
     background: white;
-    padding: 10px;
+    padding: 20px;
     border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* List styles */
-#results-list,
-#suggestions-list {
-    list-style-type: none;
-    padding: 0;
+/* Results grid layout */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-#suggestions-list {
+/* Result card styling */
+.result-card {
     background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-/* Individual suggestion item styles */
-.suggestion-item {
-    padding: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
 }
 
-.suggestion-item:hover {
-    background: #f0f0f0; /* Highlight on hover */
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Additional margin for headings */
-h1, h2 {
-    margin: 20px 0;
+.result-image {
+    height: 200px;
+    overflow: hidden;
 }
 
-/* Results list item styles */
-#results-list li {
-    background: white;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
+.result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
+
+.result-content {
+    padding: 15px;
+}
+
+.result-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.result-footer {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.free {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.fee {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.description {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.meta-details {
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 10px;
+}
+
+.website-link {
+    color: #4285F4;
+    text-decoration: none;
+}
+
+.website-link:hover {
+    text-decoration: underline;
+}
+
 /* Autocomplete styles */
 .autocomplete-container {
     position: absolute;
     background: white;
     border: 1px solid #ccc;
     border-top: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
@@ -125,36 +173,50 @@ h1, h2 {
 #map {
     height: 400px;
     width: 100%;
-    margin-top: 20px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Results styling */
-.results-list {
-    list-style: none;
-    padding: 0;
-}
-
-.results-list li {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.view-on-map {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
+/* Loading & error messages */
 .loading {
     text-align: center;
     font-style: italic;
+    padding: 20px;
+    color: #555;
 }
 
 .error {
-    color: red;
+    color: #f44336;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Date range display */
+.date-range {
+    background-color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Make sure form groups have proper spacing */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-container,
+    #resultsContainer {
+        margin: 10px;
+        max-width: none;
+    }
 }
